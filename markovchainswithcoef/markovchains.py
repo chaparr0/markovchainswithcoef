@@ -8,6 +8,10 @@ from collections import Counter
 
 from pypdf import PdfWriter, PdfReader
 
+from sklearn.linear_model import LinearRegression
+
+import datetime
+
 class MarkovChainsWC(MarkovClickstream):
 
     def __init__(self, clickstream_list: list = None, prefixed: bool = True, time_cilckstream: list = None,
@@ -32,6 +36,31 @@ class MarkovChainsWC(MarkovClickstream):
 
         self.label_node_dict = None
         self.get_label_node()
+
+        self.transition_time_predictions = dict()
+        self.__get_transition_time_predictions()
+
+    def __get_transition_time_predictions(self):
+        flattened_clickstream = list(chain.from_iterable(self.clickstream_list))
+        time_data = np.array([(self.time_cilckstream[i + 1] - self.time_cilckstream[i]).total_seconds() / 3600
+                              for i in range(len(flattened_clickstream) - 1)])
+        X = np.array([[self.pages.index(flattened_clickstream[i]), self.pages.index(flattened_clickstream[i + 1])]
+                      for i in range(len(flattened_clickstream) - 1)])
+        y = time_data.reshape(-1, 1)
+
+        model = LinearRegression()
+        model.fit(X, y)
+
+        for i, page_i in enumerate(self.pages):
+            for j, page_j in enumerate(self.pages):
+                if self.prob_matrix[i,j] == 0:
+                    self.transition_time_predictions[(page_i,page_j)] = None
+                else:
+                    state_pair = np.array([[self.pages.index(page_i), self.pages.index(page_j)]])
+                    predicted_hours = max(0, model.predict(state_pair)[0])
+                    total_seconds = int(predicted_hours * 3600)
+                    time_delta_str = str(datetime.timedelta(seconds=total_seconds))
+                    self.transition_time_predictions[(page_i, page_j)] = time_delta_str
 
     @property
     def count_matrix(self):
@@ -97,18 +126,19 @@ class MarkovChainsWC(MarkovClickstream):
             for transition in self.pages:
                 rate = self.prob_matrix[self.pages.index(state),self.pages.index(transition)]
                 if rate >= least_percent:
+                    transition_time = self.transition_time_predictions.get((state, transition), "N/A")
                     if rate < 0.25:
                         G.add_edge(state, transition,
-                                   label=f"prob = {round(rate, 2)}", color='#93d42a')
+                                   label=f"prob = {round(rate, 2)}\ntime = {transition_time}", color='#93d42a',fontsize=8)
                     elif rate < 0.5:
                         G.add_edge(state, transition,
-                                   label=f"prob = {round(rate, 2)}", color='#2aafd4')
+                                   label=f"prob = {round(rate, 2)}\ntime = {transition_time}", color='#2aafd4',fontsize=8)
                     elif rate < 0.75:
                         G.add_edge(state, transition,
-                                   label=f"prob = {round(rate, 2)}", color='#d4a62a')
+                                   label=f"prob = {round(rate, 2)}\ntime = {transition_time}", color='#d4a62a',fontsize=8)
                     elif rate > 0.75:
                         G.add_edge(state, transition,
-                                   label=f"prob = {round(rate, 2)}", color='#d42a2a')
+                                   label=f"prob = {round(rate, 2)}\ntime = {transition_time}", color='#d42a2a',fontsize=8)
 
         for key,value in self.label_node_dict.items():
             try:

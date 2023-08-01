@@ -7,7 +7,7 @@ from setuptools import setup
 :copyright: (c) 2023 chaparr0
 """
 
-version = '1.0'
+version = '2.0'
 
 """
 with open('README.md',encoding='utf-8') as f:
@@ -22,7 +22,7 @@ setup(
     name='markovchainswithcoef',
     version=version,
 
-    author='chaparr0',
+    author='chaparr0 (K.R.V. and K.A.M.)',
     author_email='madeingoa@gmail.com',
 
     description=long_description,
@@ -33,7 +33,7 @@ setup(
     license='Apache License, Version 2.0, see LICENSE file',
 
     packages=['markovchainswithcoef'],
-    install_requires=['numpy','markovclick','pygraphviz','pypdf'],
+    install_requires=['numpy','markovclick','pygraphviz','pypdf','scikit-learn'],
 
     classifiers=[
         'License :: OSI Approved :: Apache Software License',

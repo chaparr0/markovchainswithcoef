@@ -6,6 +6,6 @@
 
 from .markovchains import MarkovChainsWC
 
-__author__ = 'chaparr0'
-__version__ = '1.0'
+__author__ = 'chaparr0 (K.R.V. and K.A.M.)'
+__version__ = '2.0'
 __email__ = 'madeingoa@gmail.com'
