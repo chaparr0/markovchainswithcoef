@@ -28,6 +28,17 @@ setup(
     description=long_description,
     long_description=long_description,
 
-    url='https://github.com/chaparr0/markovchainswithcoef'
+    url='https://github.com/chaparr0/markovchainswithcoef',
 
+    license='Apache License, Version 2.0, see LICENSE file',
+
+    packages=['markovchainswithcoef'],
+    install_requires=['numpy','markovclick','pygraphviz','pypdf'],
+
+    classifiers=[
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3.8+'
+    ]
 )
